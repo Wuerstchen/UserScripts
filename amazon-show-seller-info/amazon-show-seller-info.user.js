@@ -15,8 +15,6 @@
 // @author          Tad Wohlrapp <tadwohlrapp@gmail.com>
 // @homepageURL     https://github.com/TadWohlrapp/UserScripts/tree/master/amazon-show-seller-info
 // @version         1.1.1
-// @updateURL       https://github.com/TadWohlrapp/UserScripts/raw/master/amazon-show-seller-info/amazon-show-seller-info.meta.js
-// @downloadURL     https://github.com/TadWohlrapp/UserScripts/raw/master/amazon-show-seller-info/amazon-show-seller-info.user.js
 // @supportURL      https://github.com/TadWohlrapp/UserScripts/issues
 // @match           https://smile.amazon.co.uk/*
 // @match           https://www.amazon.co.uk/*
@@ -50,6 +48,26 @@
   const isBestsellersPage = window.location.href.match(/.*\.amazon\..*\/gp\/bestsellers\/.*/) || window.location.href.match(/.*\.amazon\..*\/Best\-Sellers\-.*/);
 
   if (isSearchResultPage || isBestsellersPage) {
+    
+    function country2emoji(country_code) { // Source and full credit for this function: https://gist.github.com/theory-of-soul/220dfe7a7f383325510be31ffb0d362e
+    var OFFSET = 127397;
+    var cc = country_code.toUpperCase();
+    function _toConsumableArray(arr) {
+        if (Array.isArray(arr)) {
+            for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) {
+                arr2[i] = arr[i];
+            }
+            return arr2;
+        } else {
+            return Array.from(arr);
+        }
+    }
+    return /^[A-Z]{2}$/.test(cc) ? String.fromCodePoint.apply(String, _toConsumableArray([].concat(_toConsumableArray(cc)).map(function (c) {
+        return c.charCodeAt() + OFFSET;
+    }))) : null;
+  }    
+    
+    
     function showSellerCountry() {
 
       const products = isSearchResultPage ?
@@ -122,12 +140,7 @@
                 const sellerCountry = sellerLiLast.textContent;
 
                 if (sellerCountry.length == 2) {
-                  const flag = document.createElement('img');
-                  flag.setAttribute('src', 'https://www.countryflags.io/' + sellerCountry.toLowerCase() + '/flat/32.png');
-                  flag.setAttribute('width', '16');
-                  flag.setAttribute('height', '16');
-                  flag.setAttribute('style', 'margin-right: 5px;');
-                  flag.title = sellerCountry;
+                  const flag = document.createTextNode(country2emoji(sellerCountry));
                   sellerInfoLink.prepend(flag);
 
                   // Highlight sellers from countries defined in 'highlightedCountries'
